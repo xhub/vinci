@@ -1,0 +1,9 @@
+extreme points of a square
+V-representation
+begin
+4   3  integer
+1  -1  -1
+1  -1   1
+1   1  -1
+1   1   1
+end

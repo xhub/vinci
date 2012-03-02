@@ -1,0 +1,444 @@
+\documentclass [12pt]{article}
+\usepackage {html}
+\usepackage {amsfonts}
+
+\parindent 0cm
+\parskip 1ex plus0.5ex minus0.5ex
+
+\begin {document}
+\makeatletter
+
+\thispagestyle {empty}
+\title {\textsc {Vinci} version 1.0.5}
+\author{
+\htmladdnormallink {Benno B\"ueler}{mailto:bueeler NOSPAM ifor.math.ethz.ch} and
+\htmladdnormallink {Andreas Enge}{mailto:enge NOSPAM lix.polytechnique.fr} \\
+Current maintainer: \\
+Andreas Enge \\
+Laboratoire d'Informatique \\
+\'Ecole polytechnique \\
+91128 Palaiseau \\
+France \\
+enge@lix.polytechnique.fr}
+\date {July 2003}
+\maketitle
+
+\pagenumbering {arabic}
+
+\section {Introduction}
+
+The programme \textsc {vinci} implements several algorithms for computing the volume of a full dimensional bounded polyhedron (polytope). The polytope must be given by its vertex or hyperplane or double representation in the
+\htmlref {file format}{Input Formats} specified by
+\htmladdnormallink {David Avis}{http://www.cs.mcgill.ca/~avis} and
+\htmladdnormallink {Komei Fukuda}
+{http://www.cs.mcgill.ca/~fukuda}.
+\begin {latexonly}
+For details on this format, see
+Section \ref {Input Formats}.
+\end {latexonly}
+The code is a byproduct of our research on efficient algorithms for polytope
+volumes; the implemented algorithms are described and analysed in
+\cite {bef00}.
+
+Most of the algorithms are implemented directly in the code and can be used
+without
+installing any further programme. They need the hyperplane representation or
+the double description of the polytope. Some other methods perform calls to 
+external programmes, which have to be
+\htmlref {installed}{Installation} 
+separately\latex {, see Section \ref {Installation}}.
+
+\textsc {Vinci} can be distributed freely under the
+\textsc {GNU General Public License}.
+Please read the file
+\htmladdnormallink {\texttt {COPYING}}{../COPYING} carefully before using it.
+We cannot accept any warranty for problems you might encounter with this
+package; be aware of using it at your own risk. However,
+\htmladdnormallink {comments and suggestions}
+{mailto:enge NOSPAM lix.polytechnique.fr}
+for improvements are always welcome. If you find \textsc {vinci} useful,
+please tell us to which purpose you use it, and let us know
+about your experiences. Remember that the most powerful support for free
+software development is user's appreciation and collaboration.
+
+
+\section {Installation}
+\label {Installation}
+
+\textsc {Vinci} is available from the following site:
+
+\begin {center}
+\texttt {
+\htmladdnormallink {http://www.lix.polytechnique.fr/Labo/Andreas.Enge/Vinci.html}
+   {http://www.lix.polytechnique.fr/Labo/Andreas.Enge/Vinci.html}}
+\end {center}
+
+\noindent
+After downloading the package, unpack it by typing
+\begin{verbatim}
+   % gunzip vinci-1.0.5.tar.gz
+   % tar xvf vinci-1.0.5.tar
+\end{verbatim}
+
+\noindent
+The package consists of the files listed in Table \ref {tab:files}; they will
+be placed in the newly created subdirectory \texttt {vinci-1.0.5}.
+
+\begin {table}
+\begin {tabular} {p{4.2cm}p{8.6cm}}
+\texttt {vinci.h}              & The header file for all .c-files \\
+\texttt {vinci\_global.c}      & Global variable declarations \\
+\texttt {vinci\_memory.c}      & Various routines handling dynamic memory
+                                   allocation \\
+\texttt {vinci\_file.c}        & Functions for reading the polyhedra files \\
+\texttt {vinci\_screen.c}      & Functions for outputting control information                                      on the screen \\
+\texttt {vinci\_set.c}         & Implementation of set routines \\
+\texttt {vinci\_computation.c} & The main computational routines \\
+\texttt {vinci\_volume.c}      & Most of the volume computation routines \\
+\texttt {vinci\_lass.c}        & Lasserre's volume formula \\
+\texttt {vinci.c}              & The main programme \\
+\texttt {makefile} \\
+\texttt {COPYING}              & GNU GENERAL PUBLIC LICENSE \\
+\texttt {ChangeLog}            & A list of changes from the previous versions \\
+\texttt {manual.tex}           & The reference manual \\
+\texttt {html.sty}             & File needed for processing the manual \\
+\texttt {square.ext}           & A very simple example to get started \\
+\texttt {square.ine}           &
+\end {tabular}
+\caption {\label {tab:files}Files in the \textsc {vinci} distribution}
+\end {table}
+
+Before using the programme please read the file \texttt {COPYING}.
+For changes to previous versions, consult the file \texttt {ChangeLog}.
+If you use the gnu C compiler \texttt {gcc} you should just have to type
+\begin{verbatim}
+   % make
+\end{verbatim}
+and the executable \texttt {vinci} will be created.
+
+Otherwise edit the makefile and replace in the line \texttt {CC=gcc} the word \texttt {gcc} by the name of your local C compiler, typically \texttt {cc}. If nothing works, try
+\begin{verbatim}
+   % cc -o vinci vinci*.c
+\end{verbatim}
+The package is written in \textsc {Ansi C} and therefore should compile in any
+environment.
+
+If you want to use all of the volume computation algorithms you need to install
+the additional programme \textsc {lrs}, which can be obtained from the following site:
+
+\begin {tabular} {p{2cm}p{9.5cm}}
+author:    & David Avis
+(\htmladdnormallink {http://www.cs.mcgill.ca/\~{}avis}{http://www.cs.mcgill.ca/~avis}) \\
+http site:  &
+\htmladdnormallink
+{\texttt {http://cgm.cs.mcgill.ca/\~{}avis/C/lrslib/}}
+{http://cgm.cs.mcgill.ca/~avis/C/lrslib/} \\
+file name: & \texttt {lrslib-*.tar.gz}, where ``*'' stands for the actual version
+\end {tabular}
+
+Please use \textsc {lrslib} in version 0.40 or later. After compiling the programme copy the executable \texttt {lrs} to the directory \texttt {vinci-1.0.5}.
+
+
+\section {Input Formats}
+\label {Input Formats}
+
+\subsection {Description}
+\label {Description}
+
+Generally spoken, a polytope can either be defined as the bounded intersection
+of finitely many halfspaces (we speak about \emph {H-representation} in this case) or as the convex hull of its finally many vertices (\emph {V-representation}). Depending on the specified algorithm, one or both of these description are needed. The polytope is communicated to the programme in the form of files using the polyhedra format of Avis and Fukuda. Different types of description are recognized from the default file name extension:
+
+\begin {itemize}
+\item [\texttt {.ine}:]
+   inequalities defining the polytope as intersection of halfspaces
+\item [\texttt {.ext}:]
+   vertices (extreme points) of the polytope
+\end {itemize}
+
+\noindent
+To describe the polytope $\{x \in \mathbb{R}^d : Ax \leq b\}$ where $A$ is a
+matrix of dimension $m\times d$ and $b$ a vector of dimension $m$, the
+corresponding \texttt {.ine}-file is given by:
+
+\begin {tabular} {ccl}
+\\
+\hline
+\multicolumn {3}{l} {various comments} \\
+\multicolumn{ 3}{l} {\bf begin} \\
+$m$ & $d+1$ & {\bf numbertype} \\
+$b$ & $-A$ \\
+\multicolumn {3}{l} {\bf end} \\
+\multicolumn {3}{l} {various options} \\
+\hline
+\end {tabular}
+
+\noindent
+\texttt {numbertype} can be one of \texttt {integer}, \texttt {float} or \texttt {rational}. In the case
+of rational number type each number can be given in ordinary integer
+representation or as a fraction $p/q$ or $-p/q$, where $p$ and $q$ are
+positive integers of arbitrary length. At the time being, all rational input is converted to floating point, and all computations are done with floating point
+arithmetics. To facilitate conversion from H- to V-representation, it is recommended to write \texttt {H-representation} before \texttt {begin}.
+
+To describe a polytope as the convex hull of its vertices $v_1, \ldots, v_n$,
+the format of the \texttt {.ext}-file is the following:
+
+\begin {tabular} {ccl}
+\\
+\hline
+\multicolumn {3}{l} {various comments} \\
+\multicolumn {3}{l} {\bf begin} \\
+ $n$      & $d+1$     & {\bf numbertype} \\
+ $1$      & $v_1$     & \\
+ $\vdots$ & $\vdots$  & \\
+ $1$      & $v_n$     & \\
+\multicolumn {3}{l} {\bf end} \\
+\multicolumn {3}{l} {various options} \\
+\hline
+\end{tabular}
+
+\noindent
+To facilitate conversion from V- to H-representation, it is recommended to
+write \texttt {V-representation} before \texttt {begin}.
+
+
+\subsection {Example}
+\label {Example}
+
+To illustrate the file format, let us consider the simple example of the
+square $\{(x, y) \in \mathbb{R}^2 : -1 \leq x, y \leq 1\}$.
+The file \texttt {square.ine} is given by:
+
+\begin {tabular} {cccl}
+\hline
+\multicolumn {4}{l} {square} \\
+\multicolumn {4}{l} {H-representation} \\
+\multicolumn {4}{l} {begin} \\
+4 &  3 & \multicolumn {2}{l}{integer} \\
+1 &  1 &  0 \\
+1 & -1 &  0 \\
+1 &  0 &  1 \\
+1 &  0 & -1 \\\multicolumn {4}{l} {end} \\
+\hline
+\end {tabular}
+
+where the first two lines represent the inequalities for $x$ and the last ones
+those for $y$.
+
+The file \texttt {square.ext} presents itself as:
+
+\begin {tabular} {cccl}
+\hline
+\multicolumn {4}{l} {extreme points of a square} \\
+\multicolumn {4}{l} {V-representation} \\
+\multicolumn {4}{l} {begin} \\
+4 &  3 & \multicolumn {2}{l}{integer} \\
+1 & -1 & -1 \\
+1 & -1 &  1 \\
+1 &  1 & -1 \\
+1 &  1 &  1 \\
+\multicolumn {4}{l} {end} \\
+\hline
+\end {tabular}
+
+
+\subsection {Conversion between Representations}
+To make use of different volume computation algorithms which need different
+types of files, it may be desirable to change between V- and H-representation
+of a polytope. This job can be done using \textsc {cddlib},
+see
+\htmladdnormallink
+{\texttt {http://www.cs.mcgill.ca/\~{}fukuda/soft/cdd\_home/cdd.html}}
+{http://www.cs.mcgill.ca/\~{}fukuda/soft/cdd\_home/cdd.html}.
+
+To convert the floating point file \texttt {square.ext} to
+\texttt {square.ine}, just type:
+\begin{verbatim}
+   % cddf+ square.ine
+\end{verbatim}
+The other way is performed by
+\begin{verbatim}
+   % cddf+ square.ext
+\end{verbatim}
+
+If you desire to perform a conversion with exact arithmetics for rational data,
+use \texttt {cddr+} instead of \texttt {cddf+}.
+
+
+\section{Running the Programme...}
+\label {Running the Programme}
+
+Several volume computation algorithms have been implemented which are
+more or less efficient on different problem classes. The way you use the
+programme will therefore depend on the knowledge you have about special 
+properties of your problem.
+
+Basically you can specify a certain method yourself or leave this task to the
+programme which will try to determine a hopefully efficient method.
+
+
+\subsection {... Without Specifying a Method}
+\label {Without Specifying a Method}
+To compute the volume of a polytope you do not have any special knowledge about just type \texttt {vinci} followed by the basic
+file name, i.e. without the file extensions which are appended automatically.
+The programme will then 
+\hyperref {choose a method automatically}
+{choose a method automatically as described in Section }{}
+{Automatic Method Proposal}.
+In 
+\hyperref {our example}{the example of Section }{}{Example} you would have to 
+type
+\begin{verbatim}
+   % vinci square
+\end{verbatim}
+
+
+\subsection {... Specifying a Method}
+\label {Specifying a Method}
+If your problem has a special structure some algorithm may be more efficient
+than another one although this is not detected by the automatic method
+proposal. So you might like to specify the method yourself. In this case use
+the option \texttt {-m} followed by the abriged name of the method. Thus
+\begin{verbatim}
+   % vinci square -m rch
+\end{verbatim}
+or
+\begin{verbatim}
+   % vinci -m rch square
+\end{verbatim}
+would use Cohen and Hickey's triangulation method to compute the square area.
+
+Table \ref {tab:methods} presents the implemented algorithms together with the
+files and the additional programmes needed. Please make sure that you have created the necessary files and installed the listed packages before choosing a method.
+
+If you choose a method which cannot be used because files or programmes are
+missing you get a list of possible algorithms and a
+\hyperref {method proposal}{method proposal as described in Section }{}
+{Automatic Method Proposal}.
+
+\begin {table}
+\begin {flushleft}
+\begin {tabular} {p{1.4cm}p{1.3cm}p{1.8cm}p{7cm}}
+method & needed files & additional software & remarks \\
+\hline
+\texttt {hot}
+       & \texttt {.ext}
+       & ---   & uses a Cohen\&Hickey--like face enumeration
+       scheme and Householder orthogonalisation  \\
+\texttt {rlass}
+       & \texttt {.ine}
+       & ---   & Lasserre's method; specially suited for
+       near--simple polytopes \\
+\texttt {rch}
+       & \texttt {.ext}
+       & ---   & Cohen\&Hickey--triangulation; specially suited
+       for near--simplicial polytopes, numerically very robust  \\
+\texttt {lawd}
+       & \texttt {.ine}
+       & \textsc {lrs}   & Lawrence's formula in the general case,
+       numerically unstable \\
+\texttt {lawnd}
+       & \texttt {.ext .ine}
+       & ---   & Lawrence's formula, only for non--degenerate
+       (simple) polytopes; extremely fast, numerically unstable \\
+\texttt {lrs}
+       & \texttt {.ext}
+       & \textsc {lrs}   & boundary triangulation via \textsc                        {lrs}; works only if the origin is contained in the
+       polytope interior. computes the exact rational volume. \\
+\hline
+\end {tabular}
+\end {flushleft}
+\caption {\label {tab:methods}Implemented algorithms}
+\end {table}
+
+Usually \texttt {hot} is the fastest code.
+
+\subsection {Further Options}
+\label {Further Options}
+There are additional options which start with a ``--'' and can be specified
+at any place in the command line.
+
+The most important feature of \texttt {hot}, \texttt {rlass} and \texttt {rlch} is the ability of storing intermediate results for later use.
+This behaviour can be controlled via the option \texttt {-s} which must be directly (without space) followed by the number of levels for which storing is desired. So \texttt {-s0} prevents all storing, and \texttt {-s5} allows storing for up to five levels. Of course higher values are preferable, but may exceed the available memory.
+
+The objective functions for \texttt {lawd} and \texttt {lawnd} are determined randomly. Different objective functions can be obtained by setting a random seed with the option \texttt {-r} directly followed by an integer.
+
+The default behaviour when an option is not specified by the user can be 
+controlled using 
+\hyperref {\texttt {\#define}-sequences in the code}
+{\texttt {\#define}-sequences in the code; see Section }{}{Adopting the Code}.
+
+\subsection {Automatic Method Proposal}
+\label {Automatic Method Proposal}
+The detection of a good method follows this scheme: If possible \texttt {hot}
+is chosen, otherwise \texttt {rlass} or \texttt {lrs} in this order.
+Note that often \texttt {lrs} will be very efficient (and has the additional
+advantage of computing the exact volume without rounding problems) but is not
+recommended because the programme cannot completely check its applicability ---
+it does not know if the origin is contained in the polytope interior.
+
+This way of choosing a method has been suggested by extended experiments.
+
+
+\section {Adopting the Code to Your Requirements}
+\label {Adopting the Code}
+
+Sometimes it will be necessary or useful to change the code according to the
+type of your volume computation problems. This can be done by editing
+\texttt {vinci.h} and changing the preprocessor definitions at the beginning of the file. Following is a list of the definitions subject to personal changes:
+
+\begin {itemize}
+\item \texttt {LRS\_EXEC}:
+   This constant defines how \textsc {lrs} is called. If you
+   prefer to have the executable in a directory different from
+   \texttt {vinci-1.0.5}, change the call appropriately by introducing the
+   (absolute or relative) path name.
+\item \texttt {PIVOTING}, \texttt {MIN\_PIVOT}:
+   The value of PIVOTING determines the strategy for computing determinants
+   (e. g. simplex volumes) by Gaussian elimination for all methods except for
+   \texttt {rlass}. If it is 0, the first entry with absolute value bigger than    \texttt {MIN\_PIVOT} is chosen as pivot element;
+   if it is 1, partial pivoting, if it is 2, total pivoting is performed.
+   We obtained results with the maximal machine accuracy using partial
+   pivoting, while the zero value for \texttt {PIVOTING} caused numerical          problems without speeding up the computations considerably.
+\item \texttt {PIVOTING\_LASS}, \texttt {MIN\_PIVOT\_LASS}:
+   The values of these constants are valid for \texttt {rlass}. We found that       unlike the other algorithms, this method is considerably sped up when using a     small \texttt {MIN\_PIVOT} value.
+\item \texttt {DEFAULT\_STORAGE}:
+   The constant is important for methods where intermediate volumes can be
+   stored, i.e. \texttt {hot} and \texttt {rlass}. It
+   designates the number of recursion levels on which storage is allowed.
+   All these methods are sped up enormously when storing more results. The value     is overwritten when the option \texttt {-s} is specified.
+\item \texttt {STATISTICS}:
+   If this constant is defined, the programme will output some statistical data.
+   For triangulations and Lawrence's formula this is the total number of
+   simplices (or summed up partial volumes) as well as their distribution into
+   different size classes. The output can be used to detect possible numerical
+   instabilities. For methods storing intermediate results the number of
+   partial volumes computed and retrieved in each dimension is output.
+   If you are not interested in the data replace the definition
+   by \texttt {\#define NO\_STATISTICS}.
+\item \texttt {RATIONAL}:
+   Earlier versions could handle rational numbers; this feature has somehow been
+   lost during the development, but should not be too difficult to implement.
+   If you are interested in exact arithmetics, do not hesitate to contact the
+   authors.
+\end {itemize}
+
+
+\section {Acknowledgements}
+\label {Acknowledgements}
+The first version of \textsc {vinci} was developed within the
+ETHZ-EPFL project on Optimisation and Geometric Computation,
+in close collaboration with Komei Fukuda.
+We thank Paul A. Vixie for making available to us
+his efficient \textsc {avl}-tree implementation and Jean-Bernard Lasserre for fruitful discussions concerning his volume computation method. We are grateful to
+Hans-Jakob L\"uthi for his kind support and for initiating our project.
+
+\begin{thebibliography}{1}
+\bibitem{bef00}
+Benno B\"ueler, Andreas Enge, and Komei Fukuda.
+\newblock Exact volume computation for polytopes: A practical study.
+\newblock In Gil Kalai and G\"unter~M. Ziegler, editors, {\em Polytopes ---
+  Combinatorics and Computation}, volume~29 of {\em DMV Se\-mi\-nar}, pages
+  131--154, Basel, 2000. Birkh\"auser Verlag.
+\end{thebibliography}
+
+\end {document}

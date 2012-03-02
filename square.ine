@@ -1,0 +1,9 @@
+square
+H-representation
+begin
+4   3 integer
+1   1   0
+1  -1   0
+1   0   1
+1   0  -1
+end

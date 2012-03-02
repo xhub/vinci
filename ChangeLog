@@ -1,0 +1,41 @@
+Version 1.0.5 (July 6, 2003):
+- Corrected a bug related to the computation of the incidence structure.
+
+Version 1.0.4 (February 9, 2001):
+- The format of the incidence file changed from time to time in the past.
+  To become independent of these changes, the incidence structure is now
+  derived from the vertex and the facette information. Thus, the incidence
+  file becomes obsolete. A further advantage of this change is that the
+  incidence file necessarily depends on the order of the entries in the
+  facette and the vertex file. With the new implementation, rows may be
+  interchanged freely in these two files.
+
+Version 1.0.3 (February 4, 2001):
+- changed the implementation of the incidence structure. Instead of the
+  normal set implementation (ordered lists of vertices) to represent a facet,
+  a boolean array indexed by the vertices is used. Since in our case
+  intersections of sets are in fact only intersections of a set with a facet,
+  these are implemented faster now by looking up all the elements of the set
+  in the boolean array of the facet. Precomputations of hyperplane
+  intersections are useless now, so that the '-p'-options are dropped.
+  Overall, 'rch' and 'hot' become noticeably faster on near-simple input.
+- removed the concept of memory reserve, which was not very useful in
+  practice (for instance, because of virtual memory)
+
+Version 1.0.2 (January 7, 2001):
+- removed the volume computation methods 'cdd+', 'cdd-' and 'qhull',
+  which were not very efficient on our examples and furthermore depended
+  on external programmes so that maintaining them would have needed 
+  continual work
+- removed the volume computation methods 'gs' and 'gsh' because Gram-
+  Schmidt orthonormalisation was numerically unstable
+- removed the volume computation method 'hoth' because storing intermediate
+  volumes of faces with the incident hyperplanes as key is not efficient;
+  it requires more memory and in degenerate polytopes does not allow to
+  recognise all faces when they appear again
+- removed all reminiscents of code for centre of gravity computation; this   
+  is more easily reprogrammed from scratch
+
+Version 1.0.1 (January 5, 2001):
+- incorporated the modifications made in Zurich; mainly changed the time
+  measurement
