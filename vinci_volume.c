@@ -129,7 +129,7 @@ void volume_ch_file (rational *volume, char *vertexfile, char *planesfile)
 
 /****************************************************************************************/
 
-static void tri_ortho (int d, rational *V)
+void tri_ortho (int d, rational *V)
    /* After recursion V contains the volume of the actually considered face (stored in  */
    /* the global variable face [d]), and the global variable ortho_basis [d] contains   */
    /* an orthonormal basis of the corresponding linear subspace.                        */
@@ -267,9 +267,10 @@ void volume_ortho_file (rational *volume, char *vertexfile, char *planesfile)
    scaling_factor = normalise_vertices ();
 
    /* preparing the global variables */
-   face = create_faces ();
-   face [G_d] = duplicate_set (G_Vertices);
-   ortho_basis = create_basis ();
+   face = create_faces();
+   free_set(face[G_d]);
+   face[G_d] = duplicate_set(G_Vertices);
+   ortho_basis = create_basis();
    tree_volumes = NULL;
 
 #ifdef STATISTICS
@@ -286,11 +287,36 @@ void volume_ortho_file (rational *volume, char *vertexfile, char *planesfile)
    /* The real volume of the scaled polytope is local_volume / (factorial of dimension) */
    (*volume) = scaling_factor * local_volume / factorial (G_d);
 
-   free_incidence ();
-   free_faces (face);
-   free_basis (ortho_basis);
+   free_incidence();
+   free_faces(face);
+   free_basis(ortho_basis);
    free_set_and_vertices (vertices);
 }
+
+void volOrthoV(rational *volume)
+{
+	T_VertexSet vertices = create_empty_set();
+	rational local_volume = 0, scaling_factor;
+	compute_incidence();
+	renumber_vertices();
+	scaling_factor = normalise_vertices();
+	face = create_faces();
+   free_set(face[G_d]);
+	face[G_d] = duplicate_set(G_Vertices);
+	ortho_basis = create_basis();
+	tree_volumes = NULL;
+	key.vertices.set = create_empty_set ();
+	key.vertices.d = G_d;
+	tri_ortho(G_d, &local_volume);
+	(*volume) = scaling_factor*local_volume/factorial(G_d);
+	free_incidence ();
+	free_faces (face);
+	free_basis (ortho_basis);
+	free_set_and_vertices(vertices);
+
+}
+
+
 
 /****************************************************************************************/
 /****************************************************************************************/

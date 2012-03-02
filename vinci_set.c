@@ -213,7 +213,7 @@ rational normalise_vertices ()
       for (i = 0; i <= G_Vertices.lastel; i++)
          G_Vertices.loe [i] -> coords [j] /= scaling [j];
    }
-   
+   my_free(scaling, sizeof(rational));
    return scaling_volume;
 }
 

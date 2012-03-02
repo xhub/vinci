@@ -35,7 +35,7 @@ void *my_malloc (long int size)
 
    if (pointer == NULL)
    {
-      fprintf (stderr, "\n***** ERROR: Out of memory\n");
+      fprintf (stderr, "\n***** ERROR: Out of memory in my_alloc\n");
       exit (0);
    }
    else
@@ -183,7 +183,7 @@ T_VertexSet *create_faces ()
 
    face = (T_VertexSet *) my_malloc ((G_d + 1) * sizeof (T_VertexSet));
    for (i = 0; i <= G_d; i++)
-      face [i] = create_empty_set ();
+      face [i] = create_empty_set();
 
    return face;
 }
@@ -197,7 +197,7 @@ void free_faces (T_VertexSet *face)
 {  int i;
 
    for (i = 0; i <= G_d; i++)
-      free_set (face [i]);
+      free_set(face [i]);
    my_free (face, (G_d + 1) * sizeof (T_VertexSet));
 }
 

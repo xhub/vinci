@@ -1,7 +1,7 @@
 OBJS = vinci_global.o vinci_set.o \
        vinci_screen.o vinci_file.o vinci_memory.o \
        vinci_computation.o vinci_volume.o vinci_lass.o
-OPT  = -march=native -O3 -Wall -ansi -pedantic
+OPT  = -march=native -O3 -Wall -ansi -pedantic -g -ggdb
 CC   = gcc
       
 
